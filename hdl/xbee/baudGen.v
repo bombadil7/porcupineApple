@@ -1,7 +1,28 @@
+// baudGen.v - baud rate generation module used by transmit.v and receive.v
+// parts of the uart
+//
+// Copyright Andrei Kniazev, 2015
+// 
+// Created By:		Andrei Kniazev	
+// Last Modified:	16-November-2015 (AK)
+//
+// Revision History:
+// -----------------
+// Nov-2015		AK		Initial release
+//
+// Description: Module generates a single pulse corresponding to the desired
+// baud rate.
+//
+// Clock frequency and desired baud rate are parametrized to allow overriding
+// at instantiation time.
+// ------------
+// 
+///////////////////////////////////////////////////////////////////////////
+`timescale  1 ns / 1 ns
 module baudGen
 #(
-    parameter CLKFREQ = 100_000_000,
-    parameter BAUD = 9600
+    parameter CLKFREQ = 100_000_000,    // system clock frequency in Hz
+    parameter BAUD = 9600               // target baud rate
 )
 (
     input clk, enable, rst,
@@ -24,7 +45,7 @@ module baudGen
             counter <= 32'b0;
             tick <= 1'b0;
         end
-        else if (enable) begin
+        else if (enable) begin  // enable signal allows stopping the count when not needed
             if (counter < TopCount) begin
                 counter <= counter + 1;
                 tick <= 1'b0;
