@@ -1,16 +1,20 @@
 // xmitter.v - transmitter functionality for the XBee serial communication
-// module 
 //
 // Copyright Andrei Kniazev, 2015
 // 
-// Created By:      Andrei Kniazev  
+// Created By:      Rebecca Greene & Kelly Snyder
+// Modified by      Andrei Kniazev  
 // Last Modified:   16-November-2015 (AK)
 //
 // Revision History:
 // -----------------
-// Nov-2015     AK      Initial release
+// Dec-2013     RG & KS Initial release
+// Nov-2015     AK     Modified for battleship project 
 //
 // Description:
+//  This module receives an 8-bit data and a "send" signal and outputs it on a 
+//  serial line connected to XBee module.
+//  Module asserts a "busy" signal while performing serial data transmission.
 // ------------
 // 
 ///////////////////////////////////////////////////////////////////////////
