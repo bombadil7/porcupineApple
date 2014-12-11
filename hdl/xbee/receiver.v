@@ -1,5 +1,4 @@
-// receiver.v - receiver functionality for the XBee serial communication
-// module 
+// receiver.v - receiver functionality for the UART serial communication used by XBees
 //
 // Copyright Andrei Kniazev, 2015
 // 
@@ -10,7 +9,10 @@
 // -----------------
 // Nov-2015     AK      Initial release
 //
-// Description:
+// Description: this module takes in a serial data stream, and converts it to an 8-bit value,
+//  outputs it on the RxData_out port and asserts an RxData_ready signal to indicate that 
+//  a new value is recieved and ready to be read. Data ready signal is set for only one cycle.
+//
 // ------------
 // 
 ///////////////////////////////////////////////////////////////////////////
@@ -24,19 +26,13 @@ module receiver
     parameter   RESET_POLARITY_LOW  = 1
 )
 (
-    clk, 
-    reset,
-    RxD, 
-    RxData_out, 
-    RxData_ready,
-    RxD_idle
+    input   clk, 
+            reset,
+            RxD,            // serial data input
+    output [7:0]    RxData_out,     //  
+    output  RxData_ready,   // indicates that a complete 8-bit data value is received and can be read
+            RxD_idle
 );
-
-    // Ports
-    input RxD, clk, reset;
-    
-    output RxData_ready, RxD_idle;
-    output [7:0] RxData_out; 
 
     // state parameters 
     localparam IDLE     = 0;  
@@ -95,6 +91,8 @@ module receiver
         enBitCnt = 0; 
 
         case (state)
+            // Idle state is only entered on initial startup or reset. The
+            // rest of the operating time the down time is spent in Waiting.
             IDLE: begin
                 if (reset_in == 1) nextState = IDLE; 
                 else if (RxD == 0) begin  // start bit...
@@ -103,8 +101,9 @@ module receiver
                 end
             end
 
+            // Read in the data one bit at a time 
             SHIFT: begin
-                if (shiftCount == 10) begin
+                if (shiftCount == 10) begin     // Stop bit - the transmission is over
                     RxData_ready = 1;  
                     nextState = WAITING;          
                 end
@@ -118,6 +117,7 @@ module receiver
                 end            
             end
 
+            // waiting for another start bit to initiate a new transaction
             WAITING: begin
                 RxData_ready = 1;   //  
                 if (RxD == 0) begin  // start bit....
